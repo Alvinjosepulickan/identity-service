@@ -1,0 +1,30 @@
+create qr code generator for asp.net
+	https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-enable-qrcodes?view=aspnetcore-7.0
+	download zip from https://davidshimjs.github.io/qrcodejs/
+	extract folder and copy qrcode js and paste in wwwroot->js folder
+
+
+	create EnableAuthenticator method 
+		create model for 2 factor authentication
+	create ENableAuthenticator post method
+	setup 2 factor authentication
+		create EnableAuthenticator view
+
+	changes in Home\Index.cshtml
+		@if(@User.Identity.IsAuthenticated)
+		{
+			<a asp-controller="Account" asp-action="EnableAuthenticator">Setup two factor authentication</a>
+		}
+
+
+	create VerifyAuthenticatorCode methods and view
+
+
+
+remove 2 factor
+	in homecontroller  inject usermanager same as accountcontroller
+	add TwoFactorEnabled to view bag
+	make changes in Index view
+
+	create DisableAuthenticator method
+	

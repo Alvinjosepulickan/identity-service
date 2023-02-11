@@ -1,0 +1,164 @@
+Tools
+	vs
+	sql server
+
+github
+	https://github.com/bhrugen/IdentityManager
+Authentication type
+	cookie based: stateful
+	token based :stateless, using jwt
+		server doesnot keep record of which users are logged in or which JET has been issued
+	
+cookie based authentication
+1. used enters login credentials
+2. server verifies credentials and creates a session which is stored in db
+3. Cookie with session id is placed in user browser
+4 on subsequent requests sessionId is verified against db and if valid request is processed
+5 once user logs out session is destroyed both client-side and server-side
+
+token-based authentication
+1. user enters login credentials
+2 . server validates credentials and returns a signed token
+3 token stored in client side
+4 subsequent requests include this token
+5 server decode JWR and if token is valid processes the request
+6 once user is logged out token is destroyed
+
+
+ASP.NET Identity structure and Architecture
+
+user store & Role store(DAL) -> user Manager and Role Manager-> Sign IN Manager and other Helper
+
+EF core-> user(ASPNETUSER)
+	-> role(ASPNETROLE)
+	-> userrole(ASPNETUSERROLE)
+
+
+claims-> piece of information about user
+	key value pairs
+
+	
+
+
+1. create project Asp.Net core web app
+2.create Data folder
+	2.1 create application Db Context
+	2.2 install Microsoft.AspNetCore.Identity.EntityFrameworkCore
+	2.3 add connection string in appsettings
+		"DefaultConnection": "Server=localhost\\SQLEXPRESS01;Database=IdentityManager;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+	2.4 inject in program.cs
+3.Add Identity service
+	builder.Services.AddIdentity<IdentityUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+	app.UseAuthentication();
+	app.UseAuthorization();
+
+4 create ApplicationUser class for adding more columns in user table
+	create file in Models folder
+	add property in applicationdbcontext
+5 create model for Registerview and LoginView
+6. Create Account controller
+	Register method
+	create view Register.cshtml
+7. Login partial view
+	create _LoginPartialCustom.cshtml in shared folder
+	add partial view in _layout.cshtml
+		<partial name="_LoginPartialCustom"/>
+8.Create post method for saving user Register
+	use usermanager service for creating user
+	private readonly UserManager<IdentityUser> _userManager;
+9.Display signed user
+	add check in _LoginPartialCustome to check if user is logged in
+10. CReate method for Logoff in account controller
+11. Create view for login(get method in account controller)
+12	create method for login(post method in account controller)
+	 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password,model.RememberMe,lockoutOnFailure:false);
+
+
+
+
+13. Pages accessible only if user is logged in
+	Privacy page
+		Home controller Privacy method
+        [Authorize]
+
+		for return url in that method after authorization
+
+		public IActionResult Login(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+		make changes in login method(both get and post)
+14 handle null exception for redirect url
+	returnUrl = returnUrl ?? "~/";
+
+
+
+
+
+
+
+signin options
+	builder.Services.Configure<IdentityOptions>(
+    opt =>
+    {
+        opt.Password.RequireDigit = true;
+        opt.Password.RequireLowercase = true;
+        opt.Password.RequireUppercase = true;
+        opt.Password.RequiredLength = 8;
+        opt.Lockout.DefaultLockoutTimeSpan= TimeSpan.FromSeconds(30);
+        opt.Lockout.MaxFailedAccessAttempts= 5;
+    }
+    );
+
+
+
+create Lockoutview
+	in Account controller logic method add check for lockout
+	create LockedOut.cshtml in Account folder
+
+Reset password
+	create view for forgotpassword account controller
+	ForgotPasswordViewModel model for email
+	create post method
+	create ForgotPasswordConfirmation.cshtml for confirmation page
+
+	configure emails in application
+	ProtonMail and MailJet setup
+		create account in proton.me
+		create account in mailjet.com
+			
+		create MailJet section in appsettings
+		creat new folder for services
+			MailJetOptions.cs
+				add properties as in appsettings
+			MailJetEmailSender.cs:IEmailSender
+				install Microsoft.AspNetCore.Identity.UI nuget  
+
+				refer https://app.mailjet.com/auth/get_started/developer for code
+
+				Install-Package Mailjet.Api
+				code in above page
+				mailjet ->account->account settings->SMTP and SEND API Settings
+
+	pass email and link to service method(forgot password)
+		inject IEmailSender
+			builder.Services.AddSingleton<IEmailSender, MailJetEmailSender>();
+
+		add .AddDefaultTokenProviders() in program.cs
+
+
+
+	reset password link view
+		create actionmethod ResetPassword in accountcontroller
+
+
+	confirm email on register
+		while creating user send email for confirming
+		create confirm email method in accounts controller
+	
+
+

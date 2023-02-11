@@ -1,0 +1,44 @@
+Tools
+	vs
+	sql server
+
+github
+	https://github.com/bhrugen/IdentityManager
+Authentication type
+	cookie based: stateful
+	token based :stateless, using jwt
+		server doesnot keep record of which users are logged in or which JET has been issued
+	
+cookie based authentication
+1. used enters login credentials
+2. server verifies credentials and creates a session which is stored in db
+3. Cookie with session id is placed in user browser
+4 on subsequent requests sessionId is verified against db and if valid request is processed
+5 once user logs out session is destroyed both client-side and server-side
+
+token-based authentication
+1. user enters login credentials
+2 . server validates credentials and returns a signed token
+3 token stored in client side
+4 subsequent requests include this token
+5 server decode JWR and if token is valid processes the request
+6 once user is logged out token is destroyed
+
+
+ASP.NET Identity structure and Architecture
+
+user store & Role store(DAL) -> user Manager and Role Manager-> Sign IN Manager and other Helper
+
+EF core-> user(ASPNETUSER)
+	-> role(ASPNETROLE)
+	-> userrole(ASPNETUSERROLE)
+
+
+claims-> piece of information about user
+	key value pairs
+
+	
+
+
+1. create project Asp.Net core web app
+2

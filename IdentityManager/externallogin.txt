@@ -1,0 +1,35 @@
+Facebook login
+	create new app in http://developer.facebook.com/
+	setup facebook login in new app
+	copy application url https://localhost:7153/ and paste in www site url
+	setting of facebook login-> valid OAuth redirect uri
+								https://localhost:7153/sigin-facebook/
+	copy appid and secretkey from app settings
+	install Microsoft.AspNetCore.Authentication.Facebook
+
+	create model for appid and appsecret 
+		FacebookAuthentication
+	add facebook authentication to service
+		var facebookAuthentication= builder.Configuration.GetSection("Facebook").Get<FacebookAuthentication>();
+		builder.Services.AddAuthentication().AddFacebook(option => {
+			option.AppSecret = facebookAuthentication.Appsecret;
+			option.AppId = facebookAuthentication.AppID;
+		});
+
+
+	add facebook login in Login.cshtml
+		line 45-66
+
+	create external login method in account controller
+		 ExternalLogin(string provider, string returnurl = null)
+
+	create ExternalLoginCallback method
+		get method
+	create externalloginconfirmation view
+	create method for externalloginconfirmation for syncing user to db
+
+
+
+
+
+for more external lgins register for those api's,install nugets and add it to service 
