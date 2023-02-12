@@ -14,6 +14,14 @@
         {
             <a asp-controller="Account" asp-action="EnableAuthenticator">Setup two factor authentication</a>
         }
+        @if (User.IsInRole("Admin"))
+        {
+            <h4>Your role is Admin</h4>
+        }
+        else
+        {
+            <h4>Your role is User</h4>
+        }
     }
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>

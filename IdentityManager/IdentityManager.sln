@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C64673F6-7E55-41BB-BBE7-F444E67A0BCB}"
 	ProjectSection(SolutionItems) = preProject
 		2factorauthentication.txt = 2factorauthentication.txt
+		authorization.txt = authorization.txt
 		documentation.txt = documentation.txt
 		externallogin.txt = externallogin.txt
 	EndProjectSection

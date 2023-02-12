@@ -1,0 +1,59 @@
+[Authorize]
+[AllowAnonymous]
+
+
+action method > controller
+
+
+
+
+create roles
+	inject role manager in accounts controller
+		private readonly RoleManager<IdentityRole> _roleManager;
+
+
+	in Register get method 
+
+		if(!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                await _roleManager.CreateAsync(new IdentityRole("User"));
+            }
+	create role in AspNetRoles table
+		when register link is clicked it will create roles
+
+
+	role selection during registration
+		in RegisterViewModel add property for roles
+		add roles to RegisterViewModel
+		changes in Register get method and register view
+
+		changes in register post method
+			assign role to current user in register post method
+
+			if (model.RoleSelected != null &&model.RoleSelected=="Admin")
+                    {
+                        await _userManager.AddToRoleAsync(user,"Admin");
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "User");
+                    }
+		in external login 
+			hardcode role to user
+			in external login post method
+				ExternalLoginConfirmation post method
+				await _userManager.AddToRoleAsync(user, "User");
+
+	display current user role
+		in Index.html
+			
+        @if (User.IsInRole("Admin"))
+        {
+            <h4>Your role is Admin</h4>
+        }
+        else
+        {
+            <h4>Your role is User</h4>
+        }
+

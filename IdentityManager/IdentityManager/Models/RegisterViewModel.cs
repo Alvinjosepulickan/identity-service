@@ -23,8 +23,8 @@ namespace IdentityManager.Models
 
         [Required]
         public string Name { get; set; }
-
-        //public IEnumerable<SelectListItem> RoleList { get; set; }
-        //public string RoleSelected { get; set; }
+        
+        public IEnumerable<SelectListItem> RoleList { get; set; }
+        public string RoleSelected { get; set; }
     }
 }

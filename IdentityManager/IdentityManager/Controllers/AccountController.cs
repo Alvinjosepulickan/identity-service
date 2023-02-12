@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
@@ -16,15 +17,18 @@ namespace IdentityManager.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         //for signingin user
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IEmailSender _emailSender;
 
         private readonly UrlEncoder _urlEncoder;
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,IEmailSender emailSender, UrlEncoder urlEncoder)
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,IEmailSender emailSender, 
+            UrlEncoder urlEncoder, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _urlEncoder = urlEncoder;
+            _roleManager = roleManager;
         }
         public IActionResult Index()
         {
@@ -33,13 +37,35 @@ namespace IdentityManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Register()
         {
-            RegisterViewModel registerViewModel = new RegisterViewModel();
+            if(!await _roleManager.RoleExistsAsync("Admin"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                await _roleManager.CreateAsync(new IdentityRole("User"));
+            }
+            var roleList = _roleManager.Roles.ToList();
+            List<SelectListItem> listItem = new List<SelectListItem>();
+            foreach (var role in roleList)
+            {
+                listItem.Add(
+                new SelectListItem()
+                {
+                    Value = role.Name,
+                    Text = role.Name
+                }
+                );
+            }
+            RegisterViewModel registerViewModel = new RegisterViewModel()
+            {
+                RoleList= listItem
+            };
             return View(registerViewModel);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model,string returnUrl=null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+            returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser()
@@ -53,6 +79,14 @@ namespace IdentityManager.Controllers
                 var result=await _userManager.CreateAsync(user,model.Password);
                 if(result!=null && result.Succeeded)
                 {
+                    if (model.RoleSelected != null &&model.RoleSelected=="Admin")
+                    {
+                        await _userManager.AddToRoleAsync(user,"Admin");
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "User");
+                    }
                     var code=_userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackurl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
                     await _emailSender.SendEmailAsync(model.Email, "Confirm Email - Identity Manager",
@@ -79,8 +113,13 @@ namespace IdentityManager.Controllers
             return RedirectToAction(nameof(HomeController.Index),"Home");
         }
         [HttpGet]
-        public IActionResult Login(string returnUrl = null)
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (user!=null)
+            {
+                return await LogOff();
+            }
             returnUrl = returnUrl ?? "~/";
             ViewData["ReturnUrl"] = returnUrl;
             return View();
@@ -264,7 +303,7 @@ namespace IdentityManager.Controllers
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
-                    //await _userManager.AddToRoleAsync(user, "User");
+                    await _userManager.AddToRoleAsync(user, "User");
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
