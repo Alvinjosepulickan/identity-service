@@ -1,0 +1,20 @@
+solution/project ->add-> New scaffolded item-> Identity
+	create Ares/Identity folder
+		with cshtml and cshtml.cs files
+
+
+
+
+
+
+		to change from custom identity to scafolded identity 
+			make changes in _Layout 
+				change partial view of custom to new one
+
+
+
+		fix routing issue 
+			in program.cs
+			
+			builder.Services.AddRazorPages();
+	

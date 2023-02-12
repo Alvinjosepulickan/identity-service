@@ -11,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddIdentity<IdentityUser,IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 builder.Services.AddTransient<IEmailSender, MailJetEmailSender>();
 builder.Services.Configure<IdentityOptions>(
@@ -24,11 +26,11 @@ builder.Services.Configure<IdentityOptions>(
         opt.Lockout.MaxFailedAccessAttempts= 5;
     }
     );
-var facebookAuthentication= builder.Configuration.GetSection("Facebook").Get<FacebookAuthentication>();
-builder.Services.AddAuthentication().AddFacebook(option => {
-    option.AppSecret = facebookAuthentication.Appsecret;
-    option.AppId = facebookAuthentication.AppID;
-});
+//var facebookAuthentication= builder.Configuration.GetSection("Facebook").Get<FacebookAuthentication>();
+//builder.Services.AddAuthentication().AddFacebook(option => {
+//    option.AppSecret = facebookAuthentication.Appsecret;
+//    option.AppId = facebookAuthentication.AppID;
+//});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
