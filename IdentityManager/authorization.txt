@@ -57,3 +57,15 @@ create roles
             <h4>Your role is User</h4>
         }
 
+
+	[Authorize(Roles ="Admin")]
+		create method for AccessDenied 
+
+
+
+
+
+default accedddenied page 
+	in startup.cs
+
+
